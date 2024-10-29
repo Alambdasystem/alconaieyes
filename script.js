@@ -7,6 +7,7 @@ document.getElementById('userInput').addEventListener('keypress', function(event
     }
 });
 
+
 async function sendMessage() {
     const userInput = document.getElementById('userInput');
     const message = userInput.value.trim();
