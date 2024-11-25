@@ -1,4 +1,4 @@
-const openAIKey = 'key here';
+const openAIKey = '0c0e3ba4d37a4bf181da87d417ef635b';
 
 document.getElementById('sendButton').addEventListener('click', sendMessage);
 document.getElementById('userInput').addEventListener('keypress', function(event) {
