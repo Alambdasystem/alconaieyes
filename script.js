@@ -28,27 +28,40 @@ function addMessage(text, className) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-
 async function getOpenAIResponse(userMessage) {
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch('https://formulations-public.openai.azure.com/', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${openAIKey}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${openAIKey}`,
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                messages: [{ "role": "user", "content": userMessage }],
+                model: 'gpt-3.5-turbo',
+                messages: [{ role: 'user', content: userMessage }],
                 temperature: 0.7,
-                max_tokens: 150
-            })
+                max_tokens: 150,
+            }),
         });
 
         const data = await response.json();
-        return data.choices[0].message.content.trim();
+        console.log('Full API Response:', data);
+
+        // Check for errors in the response
+        if (data.error) {
+            console.error('API Error:', data.error);
+            return `Error: ${data.error.message}`;
+        }
+
+        // Validate the success response structure
+        if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+            return data.choices[0].message.content;
+        } else {
+            console.error('Unexpected API response structure:', data);
+            return 'Sorry, I encountered an unexpected response from the AI.';
+        }
     } catch (error) {
         console.error('Error fetching response from OpenAI:', error);
-        return 'Oops, there was an error processing your request. Please try again.';
+        return 'Sorry, there was an error communicating with the AI.';
     }
 }
