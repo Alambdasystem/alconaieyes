@@ -22,6 +22,7 @@ async function listBlobs() {
 
     return blobs;
 }
+console.log(AzureStorageBlob);
 
 // Azure Blob Storage: Download the content of a blob
 async function downloadBlob(blobName) {
