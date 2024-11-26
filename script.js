@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const containerName = "input";
 
+    
     // Azure Blob Storage: List all blobs in the container
     async function listBlobs() {
         const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
