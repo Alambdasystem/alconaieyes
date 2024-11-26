@@ -111,11 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 async function getOpenAIResponse(userMessage) {
     try {
-        const response = await fetch('https://formulations-public.openai.azure.com/', {
-            method: 'POST',
+        const response = await fetch("https://formulations-public.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${openAIKey}`,
+                "Content-Type": "application/json",
+                "api-key": "0c0e3ba4d37a4bf181da87d417ef635b",
             },
             body: JSON.stringify({
                 model: 'gpt-3.5-turbo',
