@@ -9,27 +9,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
     // Azure Blob Storage: List all blobs in the container
-    async function listBlobs() {
-        const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-        const blobs = [];
+  // Azure Blob Storage: List all blobs in the container
+async function listBlobs() {
+    // Use AzureStorageBlob.BlobServiceClient (available from the CDN script)
+    const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobs = [];
 
-        for await (const blob of containerClient.listBlobsFlat()) {
-            blobs.push(blob.name);
-        }
-
-        return blobs;
+    for await (const blob of containerClient.listBlobsFlat()) {
+        blobs.push(blob.name);
     }
 
-    // Azure Blob Storage: Download the content of a blob
-    async function downloadBlob(blobName) {
-        const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-        const blobClient = containerClient.getBlobClient(blobName);
-        const downloadResponse = await blobClient.download();
-        const downloadedContent = await new Response(downloadResponse.readableStreamBody).text();
-        return downloadedContent;
-    }
+    return blobs;
+}
+
+// Azure Blob Storage: Download the content of a blob
+async function downloadBlob(blobName) {
+    const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobClient = containerClient.getBlobClient(blobName);
+    const downloadResponse = await blobClient.download();
+    const downloadedContent = await new Response(downloadResponse.readableStreamBody).text();
+    return downloadedContent;
+}
+
 
     // Add a message to the chatbox
     function addMessage(content, isUser = false) {
