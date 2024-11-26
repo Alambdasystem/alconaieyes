@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const sendButton = document.getElementById('sendButton');
-    const storageKey = process.env.STORAGE_KEY;
+    const storageKey = "B98cqtLmCCy/EOPCXqUEnW7mM6myovEhGoR7nQk3Nk7OSUqlHPuR3ok7nKYR1tWLX/TbTuDOnI2k+AStOTwhjg==";
     const connectionString = `DefaultEndpointsProtocol=https;AccountName=formulationscondensed;AccountKey=${storageKey};EndpointSuffix=core.windows.net`;
     
     const containerName = "input";
