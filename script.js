@@ -2,38 +2,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const sendButton = document.getElementById('sendButton');
-    const storageKey = "B98cqtLmCCy/EOPCXqUEnW7mM6myovEhGoR7nQk3Nk7OSUqlHPuR3ok7nKYR1tWLX/TbTuDOnI2k+AStOTwhjg==";
+    const storageKey = process.env.STORAGE_KEY;
     const connectionString = `DefaultEndpointsProtocol=https;AccountName=formulationscondensed;AccountKey=${storageKey};EndpointSuffix=core.windows.net`;
-    
     const containerName = "input";
 
-    
     // Azure Blob Storage: List all blobs in the container
-  // Azure Blob Storage: List all blobs in the container
-async function listBlobs() {
-    // Use AzureStorageBlob.BlobServiceClient (available from the CDN script)
-    const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
-    const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobs = [];
+    async function listBlobs() {
+        const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const blobs = [];
 
-    for await (const blob of containerClient.listBlobsFlat()) {
-        blobs.push(blob.name);
+        for await (const blob of containerClient.listBlobsFlat()) {
+            blobs.push(blob.name);
+        }
+
+        return blobs;
     }
 
-    return blobs;
-}
-console.log(AzureStorageBlob);
-
-// Azure Blob Storage: Download the content of a blob
-async function downloadBlob(blobName) {
-    const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
-    const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobClient = containerClient.getBlobClient(blobName);
-    const downloadResponse = await blobClient.download();
-    const downloadedContent = await new Response(downloadResponse.readableStreamBody).text();
-    return downloadedContent;
-}
-
+    // Azure Blob Storage: Download the content of a blob
+    async function downloadBlob(blobName) {
+        const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const blobClient = containerClient.getBlobClient(blobName);
+        const downloadResponse = await blobClient.download();
+        const downloadedContent = await new Response(downloadResponse.readableStreamBody).text();
+        return downloadedContent;
+    }
 
     // Add a message to the chatbox
     function addMessage(content, isUser = false) {
@@ -113,6 +107,7 @@ async function downloadBlob(blobName) {
         }
     });
 });
+
 async function getOpenAIResponse(userMessage) {
     try {
         const response = await fetch("https://formulations-public.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview", {
