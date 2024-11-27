@@ -2,17 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure Blob Storage Example</title>
-    <!-- Load Azure Blob Storage SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/azure-storage/2.10.3/azure-storage.min.js"></script>
+    <title>Alcon Eyes Knowledge Augmentation Chat Bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb, #e3f2fd);
+            background-size: 400% 400%;
+            animation: marbleEffect 15s ease infinite;
+            color: #333;
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes marbleEffect {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        #chatBox {
+            border: 2px solid #90caf9;
+            border-radius: 10px;
+            padding: 20px;
+            height: 400px;
+            overflow-y: scroll;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #userInputContainer {
+            display: flex;
+            margin-top: 20px;
+        }
+        #userInput {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #90caf9;
+            flex: 1;
+            font-size: 16px;
+        }
+        #sendButton {
+            background-color: #90caf9;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #sendButton:hover {
+            background-color: #64b5f6;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .bot-message {
+            background-color: #e3f2fd;
+            text-align: left;
+        }
+        .user-message {
+            background-color: #1e88e5;
+            color: #fff;
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-    <div id="chatBox"></div>
-    <input id="userInput" type="text" placeholder="Type a message">
-    <button id="sendButton">Send</button>
-
-    <!-- Your custom JavaScript -->
+    <h1>Welcome to Alcon Eyes Knowledge Augmentation Chat Bot!</h1>
+    <div id="chatBox">
+        <div class="message bot-message">Hello! How can I assist you with Alcon Eyes Knowledge Augmentation?</div>
+    </div>
+    <div id="userInputContainer">
+        <input type="text" id="userInput" placeholder="Type your message here...">
+        <button id="sendButton">Send</button>
+    </div>
     <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.6.0/dist/storage-blob.min.js"></script>
+
 </body>
 </html>
