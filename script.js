@@ -2,48 +2,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const sendButton = document.getElementById('sendButton');
-    const storageKey = "B98cqtLmCCy/EOPCXqUEnW7mM6myovEhGoR7nQk3Nk7OSUqlHPuR3ok7nKYR1tWLX/TbTuDOnI2k+AStOTwhjg==";
-    const connectionString = `DefaultEndpointsProtocol=https;AccountName=formulationscondensed;AccountKey=${storageKey};EndpointSuffix=core.windows.net`;
-    const containerName = "input";
 
-    // Ensure that the AzureStorageBlob is loaded
-    if (typeof AzureStorageBlob === 'undefined') {
-        console.error("AzureStorageBlob SDK is not loaded!");
-        return;
-    }
-
-    // Azure Blob Storage: List all blobs in the container
+    // Function to call the Azure Function to list blobs
     async function listBlobs() {
+        const functionUrl = 'https://backendeyes.azurewebsites.net/api/listBlobs';  // Updated with your function URL
         try {
-            const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-            const blobs = [];
+            const response = await fetch(functionUrl);  // Make the API request to the Azure Function
+            const blobs = await response.json();  // Parse the JSON response
+            console.log(blobs);  // Log the blob names to the console
 
-            for await (const blob of containerClient.listBlobsFlat()) {
-                blobs.push(blob.name);
-            }
-
-            return blobs;
+            // Optionally display blob names in the web page
+            const blobListDiv = document.getElementById('blobList');
+            blobListDiv.innerHTML = '';
+            blobs.forEach(blob => {
+                const blobItem = document.createElement('div');
+                blobItem.textContent = blob;  // Display blob name
+                blobListDiv.appendChild(blobItem);
+            });
         } catch (error) {
-            console.error("Error in listing blobs:", error);
+            console.error("Error fetching blobs:", error);
         }
     }
 
-    // Azure Blob Storage: Download the content of a blob
-    async function downloadBlob(blobName) {
-        try {
-            const blobServiceClient = AzureStorageBlob.BlobServiceClient.fromConnectionString(connectionString);
-            const containerClient = blobServiceClient.getContainerClient(containerName);
-            const blobClient = containerClient.getBlobClient(blobName);
-            const downloadResponse = await blobClient.download();
-            const downloadedContent = await new Response(downloadResponse.readableStreamBody).text();
-            return downloadedContent;
-        } catch (error) {
-            console.error("Error downloading blob:", error);
-        }
-    }
+    // Call listBlobs on page load
+    window.addEventListener('DOMContentLoaded', listBlobs);
 
-    // Add a message to the chatbox
+    // Add message to chatbox
     function addMessage(content, isUser = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
@@ -52,52 +36,36 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Handle user input
+    // Handle user input and send message to the chatbot
     async function handleUserInput(prompt) {
-        addMessage(prompt, true); // Show user message
+        addMessage(prompt, true);  // Show user message
 
-        // Extract keywords and find a relevant PDF
-        const keywords = extractKeywords(prompt);
-        const relevantPDF = await findRelevantPDF(keywords);
-
-        if (relevantPDF) {
-            const pdfContent = await downloadBlob(relevantPDF);
-            const enhancedResponse = await queryAI(prompt, pdfContent);
-            addMessage(enhancedResponse, false); // Show AI-enhanced response
+        // Extract keywords and find a relevant blob (PDF, etc.)
+        const keywords = prompt.toLowerCase().split(" ").filter(word => word.length > 3);
+        const relevantBlob = await findRelevantBlob(keywords);
+        if (relevantBlob) {
+            const blobContent = await downloadBlob(relevantBlob);
+            addMessage(blobContent, false); // Show bot response with content
         } else {
-            const aiResponse = await queryAI(prompt);
+            const aiResponse = await queryAI(prompt); // AI response from OpenAI
             addMessage(aiResponse, false); // Show basic AI response
         }
     }
 
-    // Extract keywords from the user prompt
-    function extractKeywords(prompt) {
-        return prompt.toLowerCase().split(" ").filter(word => word.length > 3);
-    }
-
-    // Find relevant PDF based on keywords
-    async function findRelevantPDF(keywords) {
-        const blobs = await listBlobs();
-        const matchingBlobs = blobs.filter(blob =>
-            keywords.some(keyword => blob.toLowerCase().includes(keyword))
-        );
-        return matchingBlobs.length > 0 ? matchingBlobs[0] : null;
-    }
-
-    // Query AI with optional context
-    async function queryAI(prompt, context = "") {
+    // Function to query AI API (e.g., OpenAI)
+    async function queryAI(prompt) {
         const payload = {
             messages: [
                 { role: "system", content: "You are an AI assistant specializing in eyes and vision." },
-                { role: "user", content: context ? `${context}\n\n${prompt}` : prompt },
-            ],
+                { role: "user", content: prompt }
+            ]
         };
 
         const response = await fetch("https://formulations-public.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-15-preview", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "api-key": "0c0e3ba4d37a4bf181da87d417ef635b",
+                "api-key": "0c0e3ba4d37a4bf181da87d417ef635b",  // Add your OpenAI API key here
             },
             body: JSON.stringify(payload),
         });
@@ -106,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return data.choices[0].message.content.trim();
     }
 
-    // Add event listeners
+    // Add event listeners for button and enter key
     sendButton.addEventListener('click', () => {
         const prompt = userInput.value.trim();
         if (prompt) {
