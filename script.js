@@ -5,15 +5,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to call the Azure Function to list blobs
     async function listBlobs() {
-        const functionUrl = 'https://backendeyes.azurewebsites.net/api/listBlobs';  // Updated with your function URL
+        const functionUrl = 'https://backendeyes.azurewebsites.net/api/listBlobs';  // Replace with your Azure Function URL
         try {
-            const response = await fetch(functionUrl);  // Make the API request to the Azure Function
-            const blobs = await response.json();  // Parse the JSON response
-            console.log(blobs);  // Log the blob names to the console
+            const response = await fetch(functionUrl, {
+                method: 'GET',  // Make sure to use the correct HTTP method (GET)
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch blobs');
+            }
+            
+            const blobs = await response.json();
+            console.log(blobs);  // Log the blob names
 
             // Optionally display blob names in the web page
             const blobListDiv = document.getElementById('blobList');
-            blobListDiv.innerHTML = '';
+            blobListDiv.innerHTML = '';  // Clear any previous list
             blobs.forEach(blob => {
                 const blobItem = document.createElement('div');
                 blobItem.textContent = blob;  // Display blob name
@@ -65,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "api-key": "0c0e3ba4d37a4bf181da87d417ef635b",  // Add your OpenAI API key here
+                "api-key": "0c0e3ba4d37a4bf181da87d417ef635b",  // Your OpenAI API key here
             },
             body: JSON.stringify(payload),
         });
